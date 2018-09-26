@@ -1,6 +1,25 @@
 var express = require("express");
 var http = require("http");
 var app = express();
+var sql = require("mssql");
+var config = {
+  user: "TERE",
+  password: "XXXXXXX",
+  server: "192.168.37.100",
+  database: "SIAP-ARICA",
+  options: {
+    encrypt: true
+  }
+};
+
+sql.connect(
+  config,
+  function(err) {
+    console.log(err);
+  }
+);
+
+var sqlRequest = new sql.Request();
 
 var hijos = ["Roxely", "Pol", "Alexia"];
 
@@ -25,21 +44,29 @@ app.delete("/hijos", (req, res) => {
   res.send("DELETE method");
 });
 
-app.get('/hijos/pol/avatar', (req, res) => {
-    //let p = new Poligo
-    
-    res.send('Hello GET:/hijos/pol/avatar' );
-  })
+app.get("/hijos/pol/avatar", (req, res) => {
+  //var Poligono = require('./poligono');
+  //let p = new Poligono(100, 200);
 
-app.get('/hijos/:hijo', (req, res) => {
-    res.send('Hello ' + req.params.hijo);
-})
+  res.send("Hello GET:/hijos/pol/avatar");
+});
+
+app.get("/hijos/:hijo", (req, res) => {
+  res.send("Hello " + req.params.hijo);
+});
+
+app.get("/consulta/:tabla", (req, res) => {
+  var tabla = req.params.tabla;
+  console.log(tabla);
+  sqlRequest.query(`select top 100 * from ${tabla}`, function(err, recordset) {
+    console.log(recordset);
+    res.send(recordset);
+  });
+});
 
 http.createServer(app).listen(8001, () => {
   console.log("Server started at http://localhost:8001");
 });
-
-
 
 /*
 const server = http.createServer((req, res) => {
